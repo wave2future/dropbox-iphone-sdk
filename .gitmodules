@@ -1,0 +1,6 @@
+[submodule "DropboxSDK/Externals/mpoauthconnection"]
+	path = DropboxSDK/Externals/mpoauthconnection
+	url = git@github.com:schwa/mpoauthconnection.git
+[submodule "DropboxSDK/Externals/TouchJSON"]
+	path = DropboxSDK/Externals/TouchJSON
+	url = git@github.com:schwa/touchjson.git

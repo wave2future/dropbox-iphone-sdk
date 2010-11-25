@@ -8,7 +8,7 @@
 
 #import "DBRequest.h"
 #import "DBError.h"
-#import "JSON.h"
+#import "CJSONDeserializer.h"
 
 
 static id networkRequestDelegate = nil;
@@ -65,7 +65,7 @@ static id networkRequestDelegate = nil;
 }
 
 - (NSObject*)resultJSON {
-    return [[self resultString] JSONValue];
+	return [[CJSONDeserializer deserializer] deserialize:[self resultData] error:NULL];
 } 
 
 - (NSInteger)statusCode {
@@ -153,18 +153,15 @@ static id networkRequestDelegate = nil;
         NSMutableDictionary* errorUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];
         // To get error userInfo, first try and make sense of the response as JSON, if that
         // fails then send back the string as an error message
-        NSString* resultString = [self resultString];
-        if ([resultString length] > 0) {
+        if ([[self resultData] length] > 0) {
             @try {
-                SBJsonParser *jsonParser = [SBJsonParser new];
-                NSObject* resultJSON = [jsonParser objectWithString:resultString];
-                [jsonParser release];
+                NSObject* resultJSON = [[CJSONDeserializer deserializer] deserialize:[self resultData] error:NULL];
                 
                 if ([resultJSON isKindOfClass:[NSDictionary class]]) {
                     [errorUserInfo addEntriesFromDictionary:(NSDictionary*)resultJSON];
                 }
             } @catch (NSException* e) {
-                [errorUserInfo setObject:resultString forKey:@"errorMessage"];
+                [errorUserInfo setObject:[self resultString] forKey:@"errorMessage"];
             }
         }
         error = [[NSError alloc] initWithDomain:@"dropbox.com" code:self.statusCode userInfo:errorUserInfo];
